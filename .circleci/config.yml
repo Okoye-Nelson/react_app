@@ -24,27 +24,21 @@ jobs:
     docker:
       - image: circleci/node:16.13.0
     steps:
-      # Checkout code from git
       - checkout
-      # Restore from cache
       - restore_cache:
           key: frontend-build
-      # Your job code here
       - run:
           name: test frontend
           command: |
             # Your code here
-            npm run test:coverage
+            npm run test
   lint-react_app:
     docker:
       - image: circleci/node:16.13.0
     steps:
-      # Checkout code from git
       - checkout
-      # Restore from cache
       - restore_cache:
           key: frontend-build
-      # Your job code here
       - run:
           name: lint react_app
           command: |
@@ -54,12 +48,9 @@ jobs:
     docker:
       - image: python:3.7.3-stretch
     steps:
-      # Checkout code from git
       - checkout
-      # Restore from cache
       - restore_cache:
           key: frontend-build
-      # Your job code here
       - run:
           name: install dependencies
           command: |
