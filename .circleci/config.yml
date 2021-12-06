@@ -8,7 +8,7 @@ orbs:
 jobs:
   build-react_app:
     docker:
-      - image: cimg/node:12.16
+      - image: cimg/node:17.2.0
     steps:
       - checkout
       - run:
@@ -22,7 +22,7 @@ jobs:
           paths: [node_modules]
   test-react_app:
     docker:
-      - image: cimg/node:12.16
+      - image: cimg/node:17.2.0
     steps:
       - checkout
       - restore_cache:
@@ -34,7 +34,7 @@ jobs:
             npm run test
   lint-react_app:
     docker:
-      - image: cimg/node:12.16
+      - image: cimg/node:17.2.0
     steps:
       - checkout
       - restore_cache:
