@@ -3,9 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
@@ -29,9 +26,11 @@
     },
     "overrides": [
       {
-        "files": ["**/*.js?(x)"],
+        "files": [
+          "**/*.js?(x)"
+        ],
         "rules": {
-          "no-console":"error",
+          "no-console": "error",
           "max-len": "warn"
         }
       }
