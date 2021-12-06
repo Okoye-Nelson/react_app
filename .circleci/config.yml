@@ -70,7 +70,7 @@ jobs:
       - run:
           name: Build docker container
           command: |
-                npm npm install -g npm@8.2.0
+                npm install -g npm@8.2.0
                 docker login --username ${DOCKERHUB_USERNAME} --password ${DOCKERHUB_PASSWORD}
                 docker build -t react_app:latest .
                 docker images ls
