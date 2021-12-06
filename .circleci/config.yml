@@ -24,7 +24,7 @@ jobs:
           
   test-react_app:
     docker:
-      - image: - image: circleci/node:13.8.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
