@@ -116,7 +116,7 @@ jobs:
             aws ecs update-service --cluster react_app-cluster --service react-sv --force-new-deployment --no-cli-pager
 
             echo "Successful!"
-            
+
 workflows:
   default:
     jobs:
@@ -129,5 +129,8 @@ workflows:
           requires: [build-react_app]
       - push-react_app:
           requires: [test-react_app, lint-react_app, lint-docker]
+          filters:
+            branches:
+              only: [master]
       - deploy:
           requires: [push-react_app]
