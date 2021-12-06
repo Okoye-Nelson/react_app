@@ -7,7 +7,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Update APP after running react_app pipeline in circleCI.
+          Update after running react_app pipeline in circleCI.
           </p>
         <a 
         className="App-link" href="https://reactjs.org" 

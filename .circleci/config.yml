@@ -79,11 +79,11 @@ jobs:
       - run:
           name: Build docker container
           command: |
-                docker login --username ${DOCKER_USERNAME} --password ${$DOCKER_PASSWORD}
+                docker login --username ${DOCKERHUB_USERNAME} --password ${$DOCKERHUB_PASSWORD}
                 docker build -t react_app:latest .
                 docker images ls
-                docker tag react_app ${DOCKER_USERNAME}/react_app:latest
-                docker push ${DOCKER_USERNAME}/react_app:latest
+                docker tag react_app ${DOCKERHUB_USERNAME}/react_app:latest
+                docker push ${DOCKERHUB_USERNAME}/react_app:latest
   deploy:
     machine: true
     steps:
