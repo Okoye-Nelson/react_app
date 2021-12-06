@@ -70,6 +70,7 @@ jobs:
       - run:
           name: Build docker container
           command: |
+                npm npm install -g npm@8.2.0
                 docker login --username ${DOCKERHUB_USERNAME} --password ${DOCKERHUB_PASSWORD}
                 docker build -t react_app:latest .
                 docker images ls
@@ -120,8 +121,5 @@ workflows:
           requires: [build-react_app]
       - push-react_app:
           requires: [test-react_app, lint-react_app, lint-docker]
-          filters:
-            branches:
-              only: [master]
       - deploy:
           requires: [push-react_app]
