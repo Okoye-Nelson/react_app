@@ -31,7 +31,7 @@ jobs:
           name: test frontend
           command: |
             # Your code here
-            npm test --passWithNoTests
+            npm run test
   lint-react_app:
     docker:
       - image: circleci/node:16.13.0
