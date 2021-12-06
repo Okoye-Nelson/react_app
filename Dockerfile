@@ -7,7 +7,7 @@ COPY public ./public
 COPY src  ./src
 COPY conf  ./conf
 
-RUN npm install -g npm@8.2.0; npm run build 
+RUN npm install -g npm@8.2.0; npm audit fix; npm run build 
 
 #EXPOSE 3000
 
