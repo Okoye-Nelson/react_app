@@ -1,4 +1,4 @@
-FROM cimg/node:17.2.0 as builder
+FROM node:latest as builder
 
 WORKDIR /usr/src/app
 
