@@ -1,4 +1,4 @@
-FROM node:16-alpine3.13 as builder
+FROM cimg/node:12.16 as builder
 
 WORKDIR /usr/src/app
 
