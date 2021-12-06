@@ -24,27 +24,21 @@ jobs:
     docker:
       - image: circleci/node:16.13.0
     steps:
-      # Checkout code from git
       - checkout
-      # Restore from cache
       - restore_cache:
           key: frontend-build
-      # Your job code here
       - run:
           name: test frontend
           command: |
             # Your code here
-            npm run test:coverage
+            npm run test
   lint-react_app:
     docker:
       - image: circleci/node:16.13.0
     steps:
-      # Checkout code from git
       - checkout
-      # Restore from cache
       - restore_cache:
           key: frontend-build
-      # Your job code here
       - run:
           name: lint react_app
           command: |
@@ -54,12 +48,9 @@ jobs:
     docker:
       - image: python:3.7.3-stretch
     steps:
-      # Checkout code from git
       - checkout
-      # Restore from cache
       - restore_cache:
           key: frontend-build
-      # Your job code here
       - run:
           name: install dependencies
           command: |
@@ -79,11 +70,11 @@ jobs:
       - run:
           name: Build docker container
           command: |
-                docker login --username ${DOCKER_USERNAME} --password ${$DOCKER_PASSWORD}
+                docker login --username ${DOCKERHUB_USERNAME} --password ${$DOCKERHUB_PASSWORD}
                 docker build -t react_app:latest .
                 docker images ls
-                docker tag react_app ${DOCKER_USERNAME}/react_app:latest
-                docker push ${DOCKER_USERNAME}/react_app:latest
+                docker tag react_app ${DOCKERHUB_USERNAME}/react_app:latest
+                docker push ${DOCKERHUB_USERNAME}/react_app:latest
   deploy:
     machine: true
     steps:
@@ -116,7 +107,7 @@ jobs:
             aws ecs update-service --cluster react_app-cluster --service react-sv --force-new-deployment --no-cli-pager
 
             echo "Successful!"
-            
+
 workflows:
   default:
     jobs:
@@ -129,5 +120,8 @@ workflows:
           requires: [build-react_app]
       - push-react_app:
           requires: [test-react_app, lint-react_app, lint-docker]
+          filters:
+            branches:
+              only: [master]
       - deploy:
           requires: [push-react_app]
