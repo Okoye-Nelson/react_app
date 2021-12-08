@@ -2,8 +2,8 @@ version: 2.1
 
 orbs:
   node: circleci/node@3.0.0
+  aws-cli: circleci/aws-cli@2.0.3
   kubernetes: circleci/kubernetes@0.12.0
-  aws-cli: circleci/aws-cli@2.0
   aws-eks: circleci/aws-eks@0.2.3
 
 jobs:
@@ -12,15 +12,17 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - restore_cache:
+          keys: [frontend-build]
       - run:
           name: Build frontend
           command: |
-            # Your code here
-            sudo npm i
+            cd frontend
+            npm i
             npm run build
       - save_cache:
+          paths: [frontend/node_modules]
           key: frontend-build
-          paths: [node_modules]
           
   test-react_app:
     docker:
@@ -28,11 +30,26 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: frontend-build
+          keys: [frontend-build]
       - run:
           name: test frontend
           command: |
+            cd frontend
             npm run test
+
+  scan-react_app:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: scan frontend
+          command: |
+            cd frontend
+            npm i
+            npm audit fix --audit-level=critical --force
 
   lint-react_app:
     docker:
@@ -121,7 +138,9 @@ workflows:
           requires: [build-react_app]
       - test-react_app:
           requires: [build-react_app]
+      - scan-react_app:
+          requires: [test-react_app]
       - push-react_app:
-          requires: [test-react_app, lint-react_app, lint-docker]
+          requires: [scan-react_app, test-react_app, lint-react_app, lint-docker]
       - deploy:
           requires: [push-react_app]

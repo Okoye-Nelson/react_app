@@ -1,4 +1,4 @@
-FROM node:latest as builder
+FROM node:16-alpine3.13 as builder
 
 WORKDIR /usr/src/app
 
@@ -7,7 +7,7 @@ COPY public ./public
 COPY src  ./src
 COPY conf  ./conf
 
-RUN npm install -g npm@latest; npm run build 
+RUN npm install; npm run build 
 
 #EXPOSE 3000
 
