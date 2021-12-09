@@ -139,5 +139,8 @@ workflows:
           requires: [test-react_app]
       - push-react_app:
           requires: [scan-react_app, test-react_app, lint-react_app, lint-docker]
+          filters:
+            branches:
+              only: [main]
       - deploy:
           requires: [push-react_app]
