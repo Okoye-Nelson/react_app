@@ -1,40 +1,56 @@
 version: 2.1
 
 orbs:
+  node: circleci/node@3.0.0
+  aws-cli: circleci/aws-cli@2.0.3
   kubernetes: circleci/kubernetes@0.12.0
-  aws-cli: circleci/aws-cli@2.0
   aws-eks: circleci/aws-eks@0.2.3
 
 jobs:
   build-react_app:
     docker:
-      - image: circleci/node:16.13.0
-    steps:
-      - checkout
-      - run:
-          name: Build front-end
-          command: |
-            # Your code here
-            sudo npm i
-            npm run build
-      - save_cache:
-          key: frontend-build
-          paths: [node_modules]
-  test-react_app:
-    docker:
-      - image: circleci/node:16.13.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: Build frontend
+          command: |
+            npm i
+            npm run build
+      - save_cache:
+          paths: [frontend/node_modules]
           key: frontend-build
+          
+  test-react_app:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [frontend-build]
       - run:
           name: test frontend
           command: |
-            # Your code here
             npm run test
+
+  scan-react_app:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: scan frontend
+          command: |
+            npm i
+            npm audit fix --audit-level=critical --force
+
   lint-react_app:
     docker:
-      - image: circleci/node:16.13.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -42,8 +58,8 @@ jobs:
       - run:
           name: lint react_app
           command: |
-            # Your code here
             npm run lint
+
   lint-docker:
     docker:
       - image: python:3.7.3-stretch
@@ -63,6 +79,7 @@ jobs:
           command: |
             . venv/bin/activate
             hadolint ./Dockerfile
+
   push-react_app:
     machine: true
     steps:
@@ -104,7 +121,7 @@ jobs:
             docker push 899955854446.dkr.ecr.us-west-2.amazonaws.com/react_app:latest
 
             echo "Update ECS cluster:"
-            aws ecs update-service --cluster react_app-cluster --service react-sv --force-new-deployment --no-cli-pager
+            aws ecs update-service --cluster react-cluster --service react-sv --force-new-deployment --no-cli-pager
 
             echo "Successful!"
 
@@ -118,10 +135,12 @@ workflows:
           requires: [build-react_app]
       - test-react_app:
           requires: [build-react_app]
+      - scan-react_app:
+          requires: [test-react_app]
       - push-react_app:
-          requires: [test-react_app, lint-react_app, lint-docker]
+          requires: [scan-react_app, test-react_app, lint-react_app, lint-docker]
           filters:
             branches:
-              only: [master]
+              only: [main]
       - deploy:
           requires: [push-react_app]

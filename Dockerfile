@@ -7,7 +7,7 @@ COPY public ./public
 COPY src  ./src
 COPY conf  ./conf
 
-RUN npm install; npm run build 
+RUN npm i --legacy-peer-dep; npm run build 
 
 #EXPOSE 3000
 
