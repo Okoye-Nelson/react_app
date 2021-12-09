@@ -13,6 +13,6 @@ echo "Push image to newly created ECR repository:"
 docker push 899955854446.dkr.ecr.us-west-2.amazonaws.com/react_app:latest
 
 echo "Update ECS cluster:"
-aws ecs update-service --cluster react_app-cluster --service react-sv --force-new-deployment --no-cli-pager
+aws ecs update-service --cluster react-cluster --service react-sv --force-new-deployment --no-cli-pager
 
 echo "Successful!"
