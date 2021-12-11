@@ -78,7 +78,7 @@ jobs:
           name: run lint
           command: |
             . venv/bin/activate
-            hadolint ./Dockerfile
+            hadolint Dockerfile
 
   push-react_app:
     machine: true
