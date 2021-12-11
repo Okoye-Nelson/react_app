@@ -30,9 +30,7 @@
     },
     "overrides": [
       {
-        "files": [
-          "**/*.js?(x)"
-        ],
+        "files": ["**/*.js?(x)"],
         "rules": {
           "no-console": "error",
           "max-len": "warn"
