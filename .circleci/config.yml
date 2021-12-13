@@ -6,6 +6,17 @@ orbs:
   kubernetes: circleci/kubernetes@0.12.0
   aws-eks: circleci/aws-eks@0.2.3
 
+commands:
+  destroy-environment:
+    description: Destroy backend cloudformation stack given a workflow ID.
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name backend-stack-${CIRCLE_WORKFLOW_ID:0:5}
+            exit 0
+
 jobs:
   build-react_app:
     docker:
@@ -80,6 +91,22 @@ jobs:
             . venv/bin/activate
             hadolint Dockerfile
 
+  deploy-cluster:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: yum -y install tar gzip jq git
+      - run:
+          name: Deploy cluster infrastructure
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/cluster.yml \
+              --tags project=react_app-${CIRCLE_WORKFLOW_ID:0:5} \
+              --stack-name backend-stack-${CIRCLE_WORKFLOW_ID:0:5} \
+              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:5}
+      - destroy-environment  
+
   push-react_app:
     machine: true
     steps:
@@ -92,7 +119,7 @@ jobs:
                 docker images ls
                 docker tag react_app ${DOCKERHUB_USERNAME}/react_app:latest
                 docker push ${DOCKERHUB_USERNAME}/react_app:latest
-  deploy:
+  deploy-react_app:
     machine: true
     steps:
       - checkout
@@ -121,7 +148,7 @@ jobs:
             docker push 899955854446.dkr.ecr.us-west-2.amazonaws.com/react_app:latest
 
             echo "Update ECS cluster:"
-            aws ecs update-service --cluster react-cluster --service react-sv --force-new-deployment --no-cli-pager
+            aws ecs update-service --cluster reactCluster --service react-sv --force-new-deployment --no-cli-pager
 
             echo "Successful!"
 
@@ -136,11 +163,13 @@ workflows:
       - test-react_app:
           requires: [build-react_app]
       - scan-react_app:
-          requires: [test-react_app]
+          requires: [build-react_app]
+      - deploy-cluster:
+          requires: [build-react_app]
       - push-react_app:
-          requires: [scan-react_app, test-react_app, lint-react_app, lint-docker]
+          requires: [scan-react_app, test-react_app, lint-react_app, lint-docker, deploy-cluster]
           filters:
             branches:
               only: [master]
-      - deploy:
+      - deploy-react_app:
           requires: [push-react_app]
